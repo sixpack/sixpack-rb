@@ -4,9 +4,9 @@ require File.expand_path('../lib/sixpack/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["SeatGeek"]
   gem.email         = ["hi@seatgeek.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
-  gem.homepage      = ""
+  gem.description   = %q{Ruby library for interacting with SeatGeek's sixpack.}
+  gem.summary       = %q{Ruby library for interacting with SeatGeek's sixpack.}
+  gem.homepage      = "http://www.seatgeek.com"
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }

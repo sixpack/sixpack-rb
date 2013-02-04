@@ -30,4 +30,14 @@ describe Sixpack do
       Sixpack.simple_participate('%%', ['trolled', 'not-trolled'], nil)
     }.to raise_error
   end
+
+  it "should not allow bad alternatives names" do
+    expect {
+      Sixpack.simple_participate('show-bieber', ['trolled'], nil)
+    }.to raise_error
+
+    expect {
+      Sixpack.simple_participate('show-bieber', ['trolled', '%%'], nil)
+    }.to raise_error
+  end
 end

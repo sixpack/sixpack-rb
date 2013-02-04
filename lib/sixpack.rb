@@ -36,6 +36,16 @@ module Sixpack
         raise ArgumentError, "Bad experiment_name"
       end
 
+      if alternatives.length < 2
+        raise ArgumentError, "Must specify at least 2 alternatives"
+      end
+
+      alternatives.each { |alt|
+        if !(alt =~ /[a-z0-9][a-z0-9\-_ ]*/)
+          raise ArgumentError, "Bad alternative name: #{alt}"
+        end
+      }
+
       params = {
         :client_id => @client_id,
         :experiment => experiment_name,

@@ -23,6 +23,8 @@ module Sixpack
   end
 
   class Session
+    attr_accessor :host, :port, :client_id
+
     def initialize(client_id=nil, options={})
       default_options = {:host => "localhost", :port => 5000}
       options = default_options.merge(options)

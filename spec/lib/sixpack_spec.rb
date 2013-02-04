@@ -74,7 +74,7 @@ describe Sixpack do
     end
     session.convert("testing")["status"].should == "ok"
 
-    session.client_id = old_client_id
+    session = Sixpack::Session.new old_client_id
     3.times do |n|
       session.participate("testing", ["one", "two"])["alternative"].should == alt_one
     end

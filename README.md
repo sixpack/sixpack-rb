@@ -20,7 +20,7 @@ Or install it yourself as:
 
 Basic example:
 
-```
+```ruby
 require 'sixpack'
 
 session = Sixpack::Session.new
@@ -34,7 +34,7 @@ session.convert("new-test")
 
 Each session has a `client_id` associated with it that must be preserved across requests. Here's what the first request might look like:
 
-```
+```ruby
 session = Sixpack::Session.new
 session.participate("new-test", ["alternative-1", "alternative-2"])
 set_cookie_in_your_web_framework("sixpack-id", session.client_id)
@@ -42,7 +42,7 @@ set_cookie_in_your_web_framework("sixpack-id", session.client_id)
 
 For future requests, create the `Session` using the `client_id` stored in the cookie:
 
-```
+```ruby
 client_id = get_cookie_from_web_framework("sixpack-id")
 session = Sixpack::Session.new client_id
 session.convert("new-test")

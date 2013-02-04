@@ -58,31 +58,25 @@ describe Sixpack do
 
   it "should work without using the simple methods" do
     session = Sixpack::Session.new
-    p session.client_id
     session.convert("testing")["status"].should == "failed"
-    session.participate("testing", ["one", "two"], "two")["alternative"].should == "two"
+    alt_one = session.participate("testing", ["one", "two"])["alternative"]
     3.times do |n|
-      p session.client_id
-      session.participate("testing", ["one", "two"])["alternative"].should == "two"
+      session.participate("testing", ["one", "two"])["alternative"].should == alt_one
     end
     session.convert("testing")["status"].should == "ok"
 
     old_client_id = session.client_id
     session.client_id = Sixpack::generate_client_id()
-
-    p session.client_id
     session.convert("testing")["status"].should == "failed"
-    session.participate("testing", ["one", "two"], "one")["alternative"].should == "one"
+    alt_two = session.participate("testing", ["one", "two"])["alternative"]
     3.times do |n|
-      session.participate("testing", ["one", "two"])["alternative"].should == "one"
+      session.participate("testing", ["one", "two"])["alternative"].should == alt_two
     end
     session.convert("testing")["status"].should == "ok"
 
     session.client_id = old_client_id
-
-    p session.client_id
     3.times do |n|
-      session.participate("testing", ["one", "two"])["alternative"].should == "two"
+      session.participate("testing", ["one", "two"])["alternative"].should == alt_one
     end
   end
 end

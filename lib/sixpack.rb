@@ -23,7 +23,12 @@ module Sixpack
   end
 
   class Session
-    def initialize(client_id = nil)
+    def initialize(client_id=nil, options={})
+      default_options = {:host => "localhost", :port => 5000}
+      options = default_options.merge(options)
+      @host = options[:host]
+      @port = options[:port]
+
       if client_id.nil?
         @client_id = Sixpack::generate_client_id()
       else
@@ -67,7 +72,7 @@ module Sixpack
     end
 
     def get_response(endpoint, params)
-      uri = URI('http://localhost:5000' + endpoint)
+      uri = URI("http://#{@host}:#{@port}" + endpoint)
       uri.query = URI.encode_www_form(params)
       res = Net::HTTP.get_response(uri)
       if res.code == "500"

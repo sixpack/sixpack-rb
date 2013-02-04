@@ -48,6 +48,14 @@ session = Sixpack::Session.new client_id
 session.convert("new-test")
 ```
 
+If you already have a client_id (you can generate one using `Sixpack.generate_client_id()`) you can use the `simple_participate()` and `simple_convert()` methods to avoid instantiating a `Session`:
+
+```ruby
+Sixpack::simple_partipate("new-test", ["alternative-1", "alternative-2"], client_id)
+
+Sixpack::simple_convert("new-test", client_id)
+```
+
 ## Contributing
 
 1. Fork it

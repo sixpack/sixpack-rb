@@ -55,7 +55,7 @@ module Sixpack
     end
 
     def participate(experiment_name, alternatives, force=nil)
-      if !(experiment_name =~ /[a-z0-9][a-z0-9\-_ ]*/)
+      if !(experiment_name =~ /^[a-z0-9][a-z0-9\-_ ]*$/)
         raise ArgumentError, "Bad experiment_name"
       end
 
@@ -64,7 +64,7 @@ module Sixpack
       end
 
       alternatives.each { |alt|
-        if !(alt =~ /[a-z0-9][a-z0-9\-_ ]*/)
+        if !(alt =~ /^[a-z0-9][a-z0-9\-_ ]*$/)
           raise ArgumentError, "Bad alternative name: #{alt}"
         end
       }

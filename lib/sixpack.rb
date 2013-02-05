@@ -6,6 +6,22 @@ require "uuid"
 require "sixpack/version"
 
 module Sixpack
+  @@host = "localhost"
+  def self.host
+    @@host
+  end
+  def self.host=(host)
+    @@host = host
+  end
+
+  @@port = 5000
+  def self.port
+    @@port
+  end
+  def self.port=(port)
+    @@port = port
+  end
+
   def self.simple_participate(experiment_name, alternatives, client_id=nil, force=nil)
     session = Session.new(client_id)
     res = session.participate(experiment_name, alternatives, force)
@@ -26,7 +42,7 @@ module Sixpack
     attr_accessor :host, :port, :client_id
 
     def initialize(client_id=nil, options={})
-      default_options = {:host => "localhost", :port => 5000}
+      default_options = {:host => Sixpack.host, :port => Sixpack.port}
       options = default_options.merge(options)
       @host = options[:host]
       @port = options[:port]

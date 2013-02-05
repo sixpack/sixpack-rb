@@ -6,7 +6,7 @@ Ruby client library for SeatGeak's Sixpack ab testing framework.
 
 Add this line to your application's Gemfile:
 
-    gem 'sixpack'
+    gem 'sixpack-client'
 
 And then execute:
 
@@ -14,7 +14,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install sixpack
+    $ gem install sixpack-client
 
 ## Usage
 

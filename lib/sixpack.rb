@@ -6,13 +6,13 @@ require "uuid"
 require "sixpack/version"
 
 module Sixpack
-  def self.simple_participate(experiment_name, alternatives, client_id, force=nil)
+  def self.simple_participate(experiment_name, alternatives, client_id=nil, force=nil)
     session = Session.new(client_id)
     res = session.participate(experiment_name, alternatives, force)
     res["alternative"]
   end
 
-  def self.simple_convert(experiment_name, client_id=nil)
+  def self.simple_convert(experiment_name, client_id)
     session = Session.new(client_id)
     session.convert(experiment_name)["status"]
   end

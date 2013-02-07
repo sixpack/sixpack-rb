@@ -39,13 +39,19 @@ module Sixpack
   end
 
   class Session
-    attr_accessor :host, :port, :client_id
+    attr_accessor :host, :port, :client_id, :ip_address, :user_agent
 
-    def initialize(client_id=nil, options={})
+    def initialize(client_id=nil, options={}, params={})
       default_options = {:host => Sixpack.host, :port => Sixpack.port}
       options = default_options.merge(options)
       @host = options[:host]
       @port = options[:port]
+
+      default_params = {:ip_address => nil, :user_agent => :nil}
+      params = default_params.merge(params)
+
+      @ip_address = params[:ip_address]
+      @user_agent = params[:user_agent]
 
       if client_id.nil?
         @client_id = Sixpack::generate_client_id()
@@ -89,9 +95,19 @@ module Sixpack
       self.get_response("/convert", params)
     end
 
+    def build_params(params)
+      if @ip_address
+        params[:ip_address] = @ip_address
+      end
+      if @user_agent
+        params[:user_agent] = @user_agent
+      end
+      params
+    end
+
     def get_response(endpoint, params)
       uri = URI("http://#{@host}:#{@port}" + endpoint)
-      uri.query = URI.encode_www_form(params)
+      uri.query = URI.encode_www_form(self.build_params(params))
       res = Net::HTTP.get_response(uri)
       if res.code == "500"
         {"status" => "failed", "response" => res.body}

@@ -6,6 +6,8 @@ require "uuid"
 require "sixpack/version"
 
 module Sixpack
+  extend self
+
   @@host = "localhost"
   def self.host
     @@host

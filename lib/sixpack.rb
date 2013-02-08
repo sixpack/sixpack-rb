@@ -10,7 +10,7 @@ module Sixpack
   def self.host
     @@host
   end
-  def self.host=(host)
+  def host=(host)
     @@host = host
   end
 
@@ -18,7 +18,7 @@ module Sixpack
   def self.port
     @@port
   end
-  def self.port=(port)
+  def port=(port)
     @@port = port
   end
 

@@ -13,18 +13,12 @@ module Sixpack
   def self.host=(host)
     @@host = host
   end
-  def host=(host)
-    @@host = host
-  end
 
   @@port = 5000
   def self.port
     @@port
   end
   def self.port=(port)
-    @@port = port
-  end
-  def port=(port)
     @@port = port
   end
 

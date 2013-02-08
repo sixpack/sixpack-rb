@@ -9,7 +9,7 @@ module Sixpack
   extend self
 
   @@host = "localhost"
-  def self.host
+  def host
     @@host
   end
   def host=(host)
@@ -17,7 +17,7 @@ module Sixpack
   end
 
   @@port = 5000
-  def self.port
+  def port
     @@port
   end
   def port=(port)

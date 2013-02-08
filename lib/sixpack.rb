@@ -8,34 +8,23 @@ require "sixpack/version"
 module Sixpack
   extend self
 
-  @@host = "localhost"
-  def host
-    @@host
-  end
-  def host=(host)
-    @@host = host
-  end
+  attr_accessor :host, :port
 
-  @@port = 5000
-  def port
-    @@port
-  end
-  def port=(port)
-    @@port = port
-  end
+  @port = 5000
+  @host = "localhost"
 
-  def self.simple_participate(experiment_name, alternatives, client_id=nil, force=nil)
+  def simple_participate(experiment_name, alternatives, client_id=nil, force=nil)
     session = Session.new(client_id)
     res = session.participate(experiment_name, alternatives, force)
     res["alternative"]
   end
 
-  def self.simple_convert(experiment_name, client_id)
+  def simple_convert(experiment_name, client_id)
     session = Session.new(client_id)
     session.convert(experiment_name)["status"]
   end
 
-  def self.generate_client_id
+  def generate_client_id
     uuid = UUID.new
     uuid.generate
   end

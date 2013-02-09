@@ -1,6 +1,6 @@
+require "addressable/uri"
 require "net/http"
 require "json"
-
 require "uuid"
 
 require "sixpack/version"
@@ -98,7 +98,7 @@ module Sixpack
 
     def get_response(endpoint, params)
       uri = "http://#{@host}:#{@port}" + endpoint
-      query = URI.encode_www_form(self.build_params(params))
+      query = Addressable::URI.form_encode(self.build_params(params))
       res = Net::HTTP.get_response(URI.parse(uri + "?" + query))
       if res.code == "500"
         {"status" => "failed", "response" => res.body}

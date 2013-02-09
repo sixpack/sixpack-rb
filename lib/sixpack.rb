@@ -87,19 +87,19 @@ module Sixpack
     end
 
     def build_params(params)
-      if @ip_address
+      unless @ip_address.nil?
         params[:ip_address] = @ip_address
       end
-      if @user_agent
+      unless @user_agent.nil?
         params[:user_agent] = @user_agent
       end
       params
     end
 
     def get_response(endpoint, params)
-      uri = URI("http://#{@host}:#{@port}" + endpoint)
-      uri.query = URI.encode_www_form(self.build_params(params))
-      res = Net::HTTP.get_response(uri)
+      uri = "http://#{@host}:#{@port}" + endpoint
+      query = URI.encode_www_form(self.build_params(params))
+      res = Net::HTTP.get_response(URI.parse(uri + "?" + query))
       if res.code == "500"
         {"status" => "failed", "response" => res.body}
       else

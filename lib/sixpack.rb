@@ -75,7 +75,12 @@ module Sixpack
         params[:force] = force
       end
 
-      self.get_response("/participate", params)
+      res = self.get_response("/participate", params)
+      # On server failure use control
+      if res["status"] == "failed"
+        res["alternative"] = alternatives[0]
+      end
+      res
     end
 
     def convert(experiment_name)
@@ -101,8 +106,12 @@ module Sixpack
       http.open_timeout = 0.25
       http.read_timeout = 0.25
       query = Addressable::URI.form_encode(self.build_params(params))
-      res = http.start do |http|
-        http.get(endpoint + "?" + query)
+      begin
+        res = http.start do |http|
+          http.get(endpoint + "?" + query)
+        end
+      rescue
+        return {"status" => "failed", "error" => "http error"}
       end
       if res.code == "500"
         {"status" => "failed", "response" => res.body}

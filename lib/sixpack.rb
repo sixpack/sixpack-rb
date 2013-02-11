@@ -97,9 +97,13 @@ module Sixpack
     end
 
     def get_response(endpoint, params)
-      uri = "http://#{@host}:#{@port}" + endpoint
+      http = Net::HTTP.new(@host, @port)
+      http.open_timeout = 0.25
+      http.read_timeout = 0.25
       query = Addressable::URI.form_encode(self.build_params(params))
-      res = Net::HTTP.get_response(URI.parse(uri + "?" + query))
+      res = http.start do |http|
+        http.get(endpoint + "?" + query)
+      end
       if res.code == "500"
         {"status" => "failed", "response" => res.body}
       else

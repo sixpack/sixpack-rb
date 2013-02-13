@@ -16,7 +16,7 @@ module Sixpack
   def simple_participate(experiment_name, alternatives, client_id=nil, force=nil)
     session = Session.new(client_id)
     res = session.participate(experiment_name, alternatives, force)
-    res["alternative"]
+    res["alternative"]["name"]
   end
 
   def simple_convert(experiment_name, client_id)
@@ -78,7 +78,7 @@ module Sixpack
       res = self.get_response("/participate", params)
       # On server failure use control
       if res["status"] == "failed"
-        res["alternative"] = alternatives[0]
+        res["alternative"] = {:name => alternatives[0]}
       end
       res
     end

@@ -2,16 +2,16 @@ require "addressable/uri"
 require "net/http"
 require "json"
 require "uuid"
+require "uri"
 
 require "sixpack/version"
 
 module Sixpack
   extend self
 
-  attr_accessor :host, :port
+  attr_accessor :base_url
 
-  @port = 5000
-  @host = "localhost"
+  @base_url = "http://localhost:5000"
 
   def simple_participate(experiment_name, alternatives, client_id=nil, force=nil)
     session = Session.new(client_id)
@@ -30,13 +30,12 @@ module Sixpack
   end
 
   class Session
-    attr_accessor :host, :port, :client_id, :ip_address, :user_agent
+    attr_accessor :base_url, :client_id, :ip_address, :user_agent
 
     def initialize(client_id=nil, options={}, params={})
-      default_options = {:host => Sixpack.host, :port => Sixpack.port}
+      default_options = {:base_url => Sixpack.base_url}
       options = default_options.merge(options)
-      @host = options[:host]
-      @port = options[:port]
+      @base_url = options[:base_url]
 
       default_params = {:ip_address => nil, :user_agent => :nil}
       params = default_params.merge(params)
@@ -102,13 +101,21 @@ module Sixpack
     end
 
     def get_response(endpoint, params)
-      http = Net::HTTP.new(@host, @port)
+      uri = URI.parse(@base_url)
+      http = Net::HTTP.new(uri.host, uri.port)
+
+      if uri.scheme == "https"
+        http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      end
+
       http.open_timeout = 0.25
       http.read_timeout = 0.25
       query = Addressable::URI.form_encode(self.build_params(params))
+
       begin
         res = http.start do |http|
-          http.get(endpoint + "?" + query)
+          http.get(uri.path + endpoint + "?" + query)
         end
       rescue
         return {"status" => "failed", "error" => "http error"}

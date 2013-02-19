@@ -77,7 +77,7 @@ module Sixpack
       res = self.get_response("/participate", params)
       # On server failure use control
       if res["status"] == "failed"
-        res["alternative"] = {:name => alternatives[0]}
+        res["alternative"] = {"name" => alternatives[0]}
       end
       res
     end

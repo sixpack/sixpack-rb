@@ -15,6 +15,14 @@ describe Sixpack do
     ['trolled', 'not-trolled'].should include(alternative)
   end
 
+  it "should return the correct alternative for simple_participate with force" do
+    alternative = Sixpack.simple_participate('show-bieber', ['trolled', 'not-trolled'], "mike", "trolled")
+    alternative.should == "trolled"
+
+    alternative = Sixpack.simple_participate('show-bieber', ['trolled', 'not-trolled'], "mike", "not-trolled")
+    alternative.should == "not-trolled"
+  end
+
   it "should allow ip and user agent to be passed to a session" do
     params = {:ip_address => '8.8.8.8', :user_agent => 'FirChromari'}
     session = Sixpack::Session.new('client_id', {}, params)

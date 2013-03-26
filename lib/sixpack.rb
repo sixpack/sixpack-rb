@@ -71,7 +71,7 @@ module Sixpack
         :alternatives => alternatives
       }
       if !force.nil? && alternatives.include?(force)
-        params[:force] = force
+        return {"status" => "ok", "alternative" => {"name" => force}, "experiment" => {"version" => 0, "name" => experiment_name}, "client_id" => @client_id}
       end
 
       res = self.get_response("/participate", params)

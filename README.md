@@ -48,13 +48,13 @@ session = Sixpack::Session.new client_id
 session.convert("new-test")
 ```
 
-If you already have a client_id (you can generate one using `Sixpack.generate_client_id()`) you can use the `simple_participate()` and `simple_convert()` methods to avoid instantiating a `Session`:
+Sessions can take an optional `options` dictionary that takes `host` and `timeout` as keys. This allows you to customize Sixpack's location.
 
-```ruby
-Sixpack::simple_partipate("new-test", ["alternative-1", "alternative-2"], client_id)
+    options = {'host': 'http://mysixpacklocation.com'}
+    session = Session(client_id="123", options=options)
 
-Sixpack::simple_convert("new-test", client_id)
-```
+If Sixpack is unreachable or other errors occur, sixpack-py will provide the control alternative.
+
 
 ## Contributing
 

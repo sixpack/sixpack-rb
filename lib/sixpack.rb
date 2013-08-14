@@ -13,17 +13,6 @@ module Sixpack
 
   @base_url = "http://localhost:5000"
 
-  def simple_participate(experiment_name, alternatives, client_id=nil, force=nil)
-    session = Session.new(client_id)
-    res = session.participate(experiment_name, alternatives, force)
-    res["alternative"]["name"]
-  end
-
-  def simple_convert(experiment_name, client_id)
-    session = Session.new(client_id)
-    session.convert(experiment_name)["status"]
-  end
-
   def generate_client_id
     uuid = UUID.new
     uuid.generate

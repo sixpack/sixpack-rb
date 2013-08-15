@@ -10,16 +10,18 @@ describe Sixpack do
     end
   end
 
-  it "should return an alternative for simple_participate" do
-    alternative = Sixpack.simple_participate('show-bieber', ['trolled', 'not-trolled'], "mike")
-    ['trolled', 'not-trolled'].should include(alternative)
+  it "should return an alternative for participate" do
+    sess = Sixpack::Session.new("mike")
+    resp = sess.participate('show-bieber', ['trolled', 'not-trolled'])
+    ['trolled', 'not-trolled'].should include(resp["alternative"]["name"])
   end
 
-  it "should return the correct alternative for simple_participate with force" do
-    alternative = Sixpack.simple_participate('show-bieber', ['trolled', 'not-trolled'], "mike", "trolled")
-    alternative.should == "trolled"
+  it "should return the correct alternative for participate with force" do
+    sess = Sixpack::Session.new("mike")
+    alt = sess.participate('show-bieber', ['trolled', 'not-trolled'], "trolled")["alternative"]["name"]
+    alt.should == "trolled"
 
-    alternative = Sixpack.simple_participate('show-bieber', ['trolled', 'not-trolled'], "mike", "not-trolled")
+    alternative = sess.participate('show-bieber', ['trolled', 'not-trolled'], "not-trolled")["alternative"]["name"]
     alternative.should == "not-trolled"
   end
 
@@ -28,51 +30,56 @@ describe Sixpack do
     session = Sixpack::Session.new('client_id', {}, params)
     session.ip_address.should == '8.8.8.8'
     session.user_agent.should == 'FirChromari'
-
   end
 
   it "should auto generate a client_id" do
-    alternative = Sixpack.simple_participate('show-bieber', ['trolled', 'not-trolled'], nil)
-    ['trolled', 'not-trolled'].should include(alternative)
+    sess = Sixpack::Session.new
+    sess.client_id.length.should == 36
   end
 
-  it "should return ok for simple_convert" do
-    alternative = Sixpack.simple_participate('show-bieber', ['trolled', 'not-trolled'], "mike")
-    Sixpack.simple_convert("show-bieber", "mike").should == "ok"
+  it "should return ok for convert" do
+    sess = Sixpack::Session.new("mike")
+    alternative = sess.participate('show-bieber', ['trolled', 'not-trolled'])
+    sess.convert("show-bieber")["status"].should == "ok"
   end
 
   it "should return ok for multiple_converts" do
-    alternative = Sixpack.simple_participate('show-bieber', ['trolled', 'not-trolled'], "mike")
-    Sixpack.simple_convert("show-bieber", "mike").should == "ok"
-    Sixpack.simple_convert("show-bieber", "mike").should == "ok"
+    sess = Sixpack::Session.new("mike")
+    sess.participate('show-bieber', ['trolled', 'not-trolled'])
+    sess.convert("show-bieber")["status"].should == "ok"
+    sess.convert("show-bieber")["status"].should == "ok"
   end
 
-  it "should not return ok for simple_convert with new id" do
-    Sixpack.simple_convert("show-bieber", "unknown_id").should == "failed"
+  it "should not return ok for convert with new id" do
+    sess = Sixpack::Session.new("unknown_id")
+    sess.convert("show-bieber")["status"].should == "failed"
   end
 
-  it "should not return ok for simple_convert with new experiment" do
-    alternative = Sixpack.simple_participate('show-bieber', ['trolled', 'not-trolled'], "mike")
-    Sixpack.simple_convert("show-blieber", "mike").should == "failed"
+  it "should not return ok for convert with new experiment" do
+    sess = Sixpack::Session.new
+    sess.convert("show-blieber")['status'].should == "failed"
   end
 
   it "should not allow bad experiment names" do
     expect {
-      Sixpack.simple_participate('%%', ['trolled', 'not-trolled'], nil)
+      sess = Sixpack::Session.new
+      sess.participate('%%', ['trolled', 'not-trolled'], nil)
     }.to raise_error
   end
 
   it "should not allow bad alternatives names" do
     expect {
-      Sixpack.simple_participate('show-bieber', ['trolled'], nil)
+      sess = Sixpack::Session.new
+      sess.participate('show-bieber', ['trolled'], nil)
     }.to raise_error
 
     expect {
-      Sixpack.simple_participate('show-bieber', ['trolled', '%%'], nil)
+      sess = Sixpack::Session.new
+      sess.participate('show-bieber', ['trolled', '%%'], nil)
     }.to raise_error
   end
 
-  it "should work without using the simple methods" do
+  it "should work" do
     session = Sixpack::Session.new
     session.convert("testing")["status"].should == "failed"
     alt_one = session.participate("testing", ["one", "two"])["alternative"]

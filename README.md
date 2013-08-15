@@ -1,7 +1,5 @@
 # Sixpack
 
-[![Build Status](https://travis-ci.org/seatgeek/sixpack-rb.png?branch=master)](https://travis-ci.org/seatgeek/sixpack-rb)
-
 Ruby client library for SeatGeak's Sixpack ab testing framework.
 
 ## Installation

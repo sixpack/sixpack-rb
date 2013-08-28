@@ -53,7 +53,7 @@ Sessions can take an optional `options` dictionary that takes `host` and `timeou
     options = {'host': 'http://mysixpacklocation.com'}
     session = Session(client_id="123", options=options)
 
-If Sixpack is unreachable or other errors occur, sixpack-py will provide the control alternative.
+If Sixpack is unreachable or other errors occur, sixpack-rb will provide the control alternative.
 
 
 ## Contributing

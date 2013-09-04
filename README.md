@@ -26,7 +26,10 @@ require 'sixpack'
 session = Sixpack::Session.new
 
 # Participate in a test (creates the test if necessary)
-session.participate("new-test", ["alternative-1", "alternative-2"])
+resp = session.participate("new-test", ["alternative-1", "alternative-2"])
+if resp["alternative"]["name"] == "alternative-1"
+    css_style = "blue"
+end
 
 # Convert
 session.convert("new-test")
@@ -48,12 +51,17 @@ session = Sixpack::Session.new client_id
 session.convert("new-test")
 ```
 
-Sessions can take an optional `options` dictionary that takes `host` and `timeout` as keys. This allows you to customize Sixpack's location.
+Sessions can take an optional `options` hash that takes `:base_url`, and a params hash that takes `:ip_address`, and `:user_agent` a keys. If you would like to instantiate a session with a known client id, you can do that here. IP address and user agent can be passed to assist in bot detection.
 
-    options = {'host': 'http://mysixpacklocation.com'}
-    session = Session(client_id="123", options=options)
+    options = {
+        :host => 'http://mysixpacklocation.com',
+    }
+    params = {
+        :ip_address => '1.2.3.4'
+    }
+    session = Session(client_id="123", options=options, params=params)
 
-If Sixpack is unreachable or other errors occur, sixpack-py will provide the control alternative.
+If Sixpack is unreachable or other errors occur, sixpack-rb will provide the control alternative object.
 
 
 ## Contributing

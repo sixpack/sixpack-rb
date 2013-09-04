@@ -1,6 +1,6 @@
 # Sixpack
 
-Ruby client library for SeatGeak's Sixpack ab testing framework.
+Ruby client library for SeatGeek's Sixpack ab testing framework.
 
 ## Installation
 

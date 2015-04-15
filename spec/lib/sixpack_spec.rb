@@ -37,29 +37,6 @@ describe Sixpack do
     sess.client_id.length.should == 36
   end
 
-  it "should return ok for convert" do
-    sess = Sixpack::Session.new("mike")
-    alternative = sess.participate('show-bieber', ['trolled', 'not-trolled'])
-    sess.convert("show-bieber")["status"].should == "ok"
-  end
-
-  it "should return ok for multiple_converts" do
-    sess = Sixpack::Session.new("mike")
-    sess.participate('show-bieber', ['trolled', 'not-trolled'])
-    sess.convert("show-bieber")["status"].should == "ok"
-    sess.convert("show-bieber")["status"].should == "ok"
-  end
-
-  it "should not return ok for convert with new id" do
-    sess = Sixpack::Session.new("unknown_id")
-    sess.convert("show-bieber")["status"].should == "failed"
-  end
-
-  it "should not return ok for convert with new experiment" do
-    sess = Sixpack::Session.new
-    sess.convert("show-blieber")['status'].should == "failed"
-  end
-
   it "should not allow bad experiment names" do
     expect {
       sess = Sixpack::Session.new
@@ -79,27 +56,4 @@ describe Sixpack do
     }.to raise_error
   end
 
-  it "should work" do
-    session = Sixpack::Session.new
-    session.convert("testing")["status"].should == "failed"
-    alt_one = session.participate("testing", ["one", "two"])["alternative"]
-    3.times do |n|
-      session.participate("testing", ["one", "two"])["alternative"].should == alt_one
-    end
-    session.convert("testing")["status"].should == "ok"
-
-    old_client_id = session.client_id
-    session.client_id = Sixpack::generate_client_id()
-    session.convert("testing")["status"].should == "failed"
-    alt_two = session.participate("testing", ["one", "two"])["alternative"]
-    3.times do |n|
-      session.participate("testing", ["one", "two"])["alternative"].should == alt_two
-    end
-    session.convert("testing")["status"].should == "ok"
-
-    session = Sixpack::Session.new old_client_id
-    3.times do |n|
-      session.participate("testing", ["one", "two"])["alternative"].should == alt_one
-    end
-  end
 end

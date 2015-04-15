@@ -41,7 +41,7 @@ module Sixpack
 
     def participate(experiment_name, alternatives, force=nil)
       if !(experiment_name =~ /^[a-z0-9][a-z0-9\-_ ]*$/)
-        raise ArgumentError, "Bad experiment_name"
+        raise ArgumentError, "Bad experiment_name, must be lowercase, start with an alphanumeric and contain alphanumerics, dashes and underscores"
       end
 
       if alternatives.length < 2
@@ -50,7 +50,7 @@ module Sixpack
 
       alternatives.each { |alt|
         if !(alt =~ /^[a-z0-9][a-z0-9\-_ ]*$/)
-          raise ArgumentError, "Bad alternative name: #{alt}"
+          raise ArgumentError, "Bad alternative name: #{alt}, must be lowercase, start with an alphanumeric and contain alphanumerics, dashes and underscores"
         end
       }
 

@@ -49,14 +49,14 @@ For future requests, create the `Session` using the `client_id` stored in the co
 
 ```ruby
 client_id = get_cookie_from_web_framework("sixpack-id")
-session = Sixpack::Session.new client_id
+session = Sixpack::Session.new(client_id)
 session.convert("new-test")
 ```
 
 Sessions can take an optional `options` hash that takes `:base_url`, and a params hash that takes `:ip_address`, and `:user_agent` a keys. If you would like to instantiate a session with a known client id, you can do that here. IP address and user agent can be passed to assist in bot detection.
 
     options = {
-        :host => 'http://mysixpacklocation.com',
+        :base_url => 'http://mysixpacklocation.com'
     }
     params = {
         :ip_address => '1.2.3.4'
@@ -65,6 +65,30 @@ Sessions can take an optional `options` hash that takes `:base_url`, and a param
 
 If Sixpack is unreachable or other errors occur, sixpack-rb will provide the control alternative object.
 
+## Configuration
+
+You can configure the Sixpack in the configure block:
+
+```ruby
+Sixpack.configure do |config|
+  config.base_url = 'http://10.20.30.40:5000'
+end
+```
+
+You can use the `configure` block when initializing your app, for instance in a
+Rails initializer.
+
+Note that options, passed directly into `Session` constructor override the configuration options.
+
+```ruby
+Sixpack.configure do |config|
+  config.base_url = 'http://foo:5000'
+end
+
+s = Sixpack::Session.new(id, base_url: 'http://bar:6000')
+
+expect(s.base_url).to eq 'http://bar:6000' #=> true
+```
 
 ## Contributing
 

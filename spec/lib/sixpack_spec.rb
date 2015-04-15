@@ -2,11 +2,37 @@ require 'redis'
 
 require 'spec_helper'
 
-describe Sixpack do
+RSpec.describe Sixpack do
   before(:each) do
     redis = Redis.new
-    redis.keys("*").each do |k|
-      redis.del(k)
+    redis.flushdb
+  end
+
+  context 'configuration' do
+    it 'should contain default base_url' do
+      s = Sixpack::Session.new("foo")
+      expect(s.base_url).to eq 'http://localhost:5000'
+    end
+
+    it 'should allow specifying the base_url in Session options' do
+      s = Sixpack::Session.new("foo", base_url: 'http://0.0.0.0:5555')
+      expect(s.base_url).to eq 'http://0.0.0.0:5555'
+    end
+
+    it 'should allow specifying the base_url in configuration block' do
+      Sixpack.configure do |config|
+        config.base_url = 'http://4.4.4.4'
+      end
+      s = Sixpack::Session.new("foo")
+      expect(s.base_url).to eq 'http://4.4.4.4'
+    end
+
+    it 'session base_url should override configuration base_url' do
+      Sixpack.configure do |config|
+        config.base_url = 'http://4.4.4.4'
+      end
+      s = Sixpack::Session.new("foo", base_url: 'http://5.5.5.5')
+      expect(s.base_url).to eq 'http://5.5.5.5'
     end
   end
 

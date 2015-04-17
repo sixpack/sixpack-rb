@@ -109,7 +109,7 @@ module Sixpack
       rescue
         return {"status" => "failed", "error" => "http error"}
       end
-      if res.code == "500"
+      if res.code == "500" || res.body == ''
         {"status" => "failed", "response" => res.body}
       else
         JSON.parse(res.body)

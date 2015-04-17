@@ -42,6 +42,14 @@ describe Sixpack do
     }.to raise_error
   end
 
+  it "should not try parse empty response body" do
+    sess = Sixpack::Session.new
+    response = double(body: '', code: 200)
+    allow_any_instance_of(Net::HTTP).to receive(:get).and_return(response)
+    res = sess.participate('show-bieber', ['trolled', 'not-trolled'])
+    expect(res["status"]).to eq('failed')
+  end
+
   it "should not allow bad alternatives names" do
     expect {
       sess = Sixpack::Session.new

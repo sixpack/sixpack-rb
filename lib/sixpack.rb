@@ -109,11 +109,17 @@ module Sixpack
       rescue
         return {"status" => "failed", "error" => "http error"}
       end
-      if res.code == "500" || res.body == ''
+      if res.code == "500"
         {"status" => "failed", "response" => res.body}
       else
-        JSON.parse(res.body)
+        parse_response(res)
       end
+    end
+
+    def parse_response(res)
+      JSON.parse(res.body)
+    rescue JSON::ParserError
+      {"status" => "failed", "response" => res.body}
     end
   end
 end

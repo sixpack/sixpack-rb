@@ -100,7 +100,7 @@ module Sixpack
     end
 
     def get_response(endpoint, params)
-      uri = URI.parse(@base_url)
+      uri = URI.parse(@base_url)      
       http = Net::HTTP.new(uri.host, uri.port)
 
       if uri.scheme == "https"
@@ -110,14 +110,15 @@ module Sixpack
 
       http.open_timeout = 0.25
       http.read_timeout = 0.25
-      # basic auth
-      http.basic_auth(@user, @password) if @user && @password
       query = Addressable::URI.form_encode(self.build_params(params))
 
       begin
-        res = http.start do |http|
-          http.get(uri.path + endpoint + "?" + query)
+        req = Net::HTTP::Get.new(uri.path + endpoint + "?" + query)
+        # basic auth
+        if @user && @password
+          req.basic_auth(@user, @password)
         end
+        res = http.request(req)
       rescue
         return {"status" => "failed", "error" => "http error"}
       end

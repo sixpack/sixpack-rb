@@ -120,8 +120,14 @@ module Sixpack
       if res.code == "500"
         {"status" => "failed", "response" => res.body}
       else
-        JSON.parse(res.body)
+        parse_response(res)
       end
+    end
+
+    def parse_response(res)
+      JSON.parse(res.body)
+    rescue JSON::ParserError
+      {"status" => "failed", "response" => res.body}
     end
   end
 end

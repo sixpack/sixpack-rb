@@ -33,6 +33,8 @@ module Sixpack
       options = Sixpack.configuration.to_hash.merge(options)
 
       @base_url = options[:base_url]
+      @user = options[:user]
+      @password = options[:password]
 
       default_params = {:ip_address => nil, :user_agent => :nil}
       params = default_params.merge(params)
@@ -108,6 +110,8 @@ module Sixpack
 
       http.open_timeout = 0.25
       http.read_timeout = 0.25
+      # basic auth
+      http.basic_auth(@user, @password) if @user && @password
       query = Addressable::URI.form_encode(self.build_params(params))
 
       begin

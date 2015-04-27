@@ -88,6 +88,12 @@ end
 s = Sixpack::Session.new(id, base_url: 'http://bar:6000')
 
 expect(s.base_url).to eq 'http://bar:6000' #=> true
+
+### Configuration options
+
+* base_url - to set the base_url for the sixpack API server
+* user - set http basic authentication user
+* password - set http basic authentication password
 ```
 
 ## Contributing

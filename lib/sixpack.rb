@@ -49,7 +49,7 @@ module Sixpack
       end
     end
 
-    def participate(experiment_name, alternatives, force=nil)
+    def participate(experiment_name, alternatives, force=nil, kpi=nil)
       if !(experiment_name =~ /^[a-z0-9][a-z0-9\-_ ]*$/)
         raise ArgumentError, "Bad experiment_name, must be lowercase, start with an alphanumeric and contain alphanumerics, dashes and underscores"
       end
@@ -69,6 +69,7 @@ module Sixpack
         :experiment => experiment_name,
         :alternatives => alternatives
       }
+      params = params.merge(kpi: kpi) if kpi
       if !force.nil? && alternatives.include?(force)
         return {"status" => "ok", "alternative" => {"name" => force}, "experiment" => {"version" => 0, "name" => experiment_name}, "client_id" => @client_id}
       end

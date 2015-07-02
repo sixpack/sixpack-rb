@@ -109,8 +109,8 @@ module Sixpack
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       end
 
-      http.open_timeout = 0.25
-      http.read_timeout = 0.25
+      http.open_timeout = 1.0
+      http.read_timeout = 1.0
       query = Addressable::URI.form_encode(self.build_params(params))
 
       begin

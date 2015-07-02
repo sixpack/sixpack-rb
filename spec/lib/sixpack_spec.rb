@@ -89,5 +89,20 @@ RSpec.describe Sixpack do
       sess.participate('show-bieber', ['trolled', '%%'], nil)
     }.to raise_error
   end
+  
+  context 'KPI' do
+
+    it 'should convert w/out a KPI' do
+      sess = Sixpack::Session.new
+      sess.participate('show-bieber', ['trolled', 'not-trolled'])
+      sess.convert('show-bieber')
+    end
+
+    it 'should allow setting a KPI when converting' do
+      sess = Sixpack::Session.new
+      sess.participate('show-bieber', ['trolled', 'not-trolled'])
+      sess.convert('show-bieber', kpi = 'sales')
+    end
+  end
 
 end

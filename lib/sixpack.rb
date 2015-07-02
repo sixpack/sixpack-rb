@@ -49,7 +49,7 @@ module Sixpack
       end
     end
 
-    def participate(experiment_name, alternatives, force=nil)
+    def participate(experiment_name, alternatives, force=nil, kpi=nil)
       if !(experiment_name =~ /^[a-z0-9][a-z0-9\-_ ]*$/)
         raise ArgumentError, "Bad experiment_name, must be lowercase, start with an alphanumeric and contain alphanumerics, dashes and underscores"
       end
@@ -69,6 +69,7 @@ module Sixpack
         :experiment => experiment_name,
         :alternatives => alternatives
       }
+      params = params.merge(kpi: kpi) if kpi
       if !force.nil? && alternatives.include?(force)
         return {"status" => "ok", "alternative" => {"name" => force}, "experiment" => {"version" => 0, "name" => experiment_name}, "client_id" => @client_id}
       end
@@ -81,11 +82,12 @@ module Sixpack
       res
     end
 
-    def convert(experiment_name)
+    def convert(experiment_name, kpi = nil)
       params = {
         :client_id => @client_id,
         :experiment => experiment_name
       }
+      params = params.merge(kpi: kpi) if kpi
       self.get_response("/convert", params)
     end
 
@@ -100,7 +102,7 @@ module Sixpack
     end
 
     def get_response(endpoint, params)
-      uri = URI.parse(@base_url)      
+      uri = URI.parse(@base_url)
       http = Net::HTTP.new(uri.host, uri.port)
 
       if uri.scheme == "https"
@@ -108,8 +110,8 @@ module Sixpack
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       end
 
-      http.open_timeout = 0.25
-      http.read_timeout = 0.25
+      http.open_timeout = 1.0
+      http.read_timeout = 1.0
       query = Addressable::URI.form_encode(self.build_params(params))
 
       begin

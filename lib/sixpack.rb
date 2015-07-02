@@ -81,11 +81,12 @@ module Sixpack
       res
     end
 
-    def convert(experiment_name)
+    def convert(experiment_name, kpi = nil)
       params = {
         :client_id => @client_id,
         :experiment => experiment_name
       }
+      params = params.merge(kpi: kpi) if kpi
       self.get_response("/convert", params)
     end
 
@@ -100,7 +101,7 @@ module Sixpack
     end
 
     def get_response(endpoint, params)
-      uri = URI.parse(@base_url)      
+      uri = URI.parse(@base_url)
       http = Net::HTTP.new(uri.host, uri.port)
 
       if uri.scheme == "https"

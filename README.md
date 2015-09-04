@@ -4,6 +4,10 @@
 
 Ruby client library for SeatGeek's Sixpack ab testing framework.
 
+## Requirements
+
+- Ruby 1.9.3+ (2.x tested via travis)
+
 ## Installation
 
 Add this line to your application's Gemfile:

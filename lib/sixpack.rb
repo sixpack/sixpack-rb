@@ -8,9 +8,7 @@ require "sixpack/version"
 require "sixpack/configuration"
 
 module Sixpack
-
   class << self
-
     def configuration
       @configuration ||= Configuration.new
     end
@@ -24,30 +22,33 @@ module Sixpack
     end
   end
 
-
   class Session
-    attr_reader :base_url
-    attr_accessor :client_id, :ip_address, :user_agent
+    attr_accessor :client_id, :params, :base_url, :user, :password
 
     def initialize(client_id=nil, options={}, params={})
       # options supplied directly will override the configured options
       options = Sixpack.configuration.to_hash.merge(options)
 
-      @base_url = options[:base_url]
-      @user = options[:user]
-      @password = options[:password]
+      self.base_url = options[:base_url]
+      self.user = options[:user]
+      self.password = options[:password]
 
-      default_params = {:ip_address => nil, :user_agent => :nil}
-      params = default_params.merge(params)
-
-      @ip_address = params[:ip_address]
-      @user_agent = params[:user_agent]
+      self.params = params.dup
+      self.params.delete_if { |_, v| v.nil? }
 
       if client_id.nil?
-        @client_id = Sixpack::generate_client_id()
+        self.client_id = Sixpack::generate_client_id
       else
-        @client_id = client_id
+        self.client_id = client_id
       end
+    end
+
+    def ip_address
+      self.params[:ip_address]
+    end
+
+    def user_agent
+      self.params[:user_agent]
     end
 
     def participate(experiment_name, alternatives, force=nil, kpi=nil)
@@ -66,13 +67,13 @@ module Sixpack
       }
 
       params = {
-        :client_id => @client_id,
+        :client_id => self.client_id,
         :experiment => experiment_name,
         :alternatives => alternatives
       }
-      params = params.merge(kpi: kpi) if kpi
+      params.merge!(kpi: kpi) if kpi
       if !force.nil? && alternatives.include?(force)
-        return {"status" => "ok", "alternative" => {"name" => force}, "experiment" => {"version" => 0, "name" => experiment_name}, "client_id" => @client_id}
+        return {"status" => "ok", "alternative" => {"name" => force}, "experiment" => {"version" => 0, "name" => experiment_name}, "client_id" => self.client_id}
       end
 
       res = self.get_response("/participate", params)
@@ -85,25 +86,15 @@ module Sixpack
 
     def convert(experiment_name, kpi = nil)
       params = {
-        :client_id => @client_id,
+        :client_id => self.client_id,
         :experiment => experiment_name
       }
-      params = params.merge(kpi: kpi) if kpi
+      params.merge!(kpi: kpi) if kpi
       self.get_response("/convert", params)
     end
 
-    def build_params(params)
-      unless @ip_address.nil?
-        params[:ip_address] = @ip_address
-      end
-      unless @user_agent.nil?
-        params[:user_agent] = @user_agent
-      end
-      params
-    end
-
     def get_response(endpoint, params)
-      uri = URI.parse(@base_url)
+      uri = URI.parse(self.base_url)
       http = Net::HTTP.new(uri.host, uri.port)
 
       if uri.scheme == "https"
@@ -113,13 +104,13 @@ module Sixpack
 
       http.open_timeout = 1.0
       http.read_timeout = 1.0
-      query = Addressable::URI.form_encode(self.build_params(params))
+      query = Addressable::URI.form_encode(params.merge self.params)
 
       begin
         req = Net::HTTP::Get.new(uri.path + endpoint + "?" + query)
         # basic auth
-        if @user && @password
-          req.basic_auth(@user, @password)
+        if self.user && self.password
+          req.basic_auth(self.user, self.password)
         end
         res = http.request(req)
       rescue

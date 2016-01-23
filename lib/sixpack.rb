@@ -2,6 +2,7 @@ require "addressable/uri"
 require "net/http"
 require "json"
 require "uri"
+require "securerandom"
 
 require "sixpack/version"
 require "sixpack/configuration"

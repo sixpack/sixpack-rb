@@ -1,13 +1,6 @@
-require 'redis'
-
 require 'spec_helper'
 
 RSpec.describe Sixpack do
-  before(:each) do
-    redis = Redis.new
-    redis.flushdb
-  end
-
   context 'configuration' do
     it 'should contain default base_url' do
       s = Sixpack::Session.new("foo")

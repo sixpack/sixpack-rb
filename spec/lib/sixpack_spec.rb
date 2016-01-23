@@ -1,13 +1,6 @@
-require 'redis'
-
 require 'spec_helper'
 
 RSpec.describe Sixpack do
-  before(:each) do
-    redis = Redis.new
-    redis.flushdb
-  end
-
   context 'configuration' do
     it 'should contain default base_url' do
       s = Sixpack::Session.new("foo")
@@ -67,7 +60,7 @@ RSpec.describe Sixpack do
     expect {
       sess = Sixpack::Session.new
       sess.participate('%%', ['trolled', 'not-trolled'], nil)
-    }.to raise_error
+    }.to raise_error(ArgumentError)
   end
 
   it "should not try parse bad response body data" do
@@ -82,16 +75,15 @@ RSpec.describe Sixpack do
     expect {
       sess = Sixpack::Session.new
       sess.participate('show-bieber', ['trolled'], nil)
-    }.to raise_error
+    }.to raise_error(ArgumentError)
 
     expect {
       sess = Sixpack::Session.new
       sess.participate('show-bieber', ['trolled', '%%'], nil)
-    }.to raise_error
+    }.to raise_error(ArgumentError)
   end
   
   context 'KPI' do
-
     it 'should convert w/out a KPI' do
       sess = Sixpack::Session.new
       sess.participate('show-bieber', ['trolled', 'not-trolled'])
@@ -104,5 +96,4 @@ RSpec.describe Sixpack do
       sess.convert('show-bieber', kpi = 'sales')
     end
   end
-
 end

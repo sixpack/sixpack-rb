@@ -60,7 +60,7 @@ RSpec.describe Sixpack do
     expect {
       sess = Sixpack::Session.new
       sess.participate('%%', ['trolled', 'not-trolled'], nil)
-    }.to raise_error
+    }.to raise_error(ArgumentError)
   end
 
   it "should not try parse bad response body data" do
@@ -75,12 +75,12 @@ RSpec.describe Sixpack do
     expect {
       sess = Sixpack::Session.new
       sess.participate('show-bieber', ['trolled'], nil)
-    }.to raise_error
+    }.to raise_error(ArgumentError)
 
     expect {
       sess = Sixpack::Session.new
       sess.participate('show-bieber', ['trolled', '%%'], nil)
-    }.to raise_error
+    }.to raise_error(ArgumentError)
   end
   
   context 'KPI' do

@@ -89,7 +89,7 @@ RSpec.describe Sixpack do
       sess.participate('show-bieber', ['trolled', '%%'], nil)
     }.to raise_error
   end
-  
+
   context 'KPI' do
 
     it 'should convert w/out a KPI' do
@@ -105,4 +105,49 @@ RSpec.describe Sixpack do
     end
   end
 
+  context 'Traffic fraction' do
+    it 'should not allow traffic fraction greater than 1' do
+      expect {
+        sess = Sixpack::Session.new
+        sess.participate('show-bieber', ['trolled', 'not-trolled'], nil, nil, '1.1')
+      }.to raise_error
+    end
+
+    it 'should not allow traffic fraction less than 0' do
+      expect {
+        sess = Sixpack::Session.new
+        sess.participate('show-bieber', ['trolled', 'not-trolled'], nil, nil, '-1')
+      }.to raise_error
+    end
+
+    it 'should allow traffic fraction when valid value is passed' do
+      expect {
+        sess = Sixpack::Session.new
+        sess.participate('show-bieber', ['trolled', 'not-trolled'], nil, nil, '0.5')
+      }.to_not raise_error
+    end
+
+    it 'should allow no traffic_fraction to be passed' do
+      expect {
+        sess = Sixpack::Session.new
+        sess.participate('show-bieber', ['trolled', 'not-trolled'])
+      }.to_not raise_error
+    end
+
+    it 'should include the fraction value in the outgoing request' do
+      experiment_name = 'show-bieber'
+      alternatives = ['trolled', 'not-trolled']
+
+      sess = Sixpack::Session.new('123')
+      expect(sess).to receive(:get_response)
+        .with('/participate',
+              client_id: '123',
+              experiment: experiment_name,
+              alternatives: alternatives,
+              traffic_fraction: '0.5')
+        .and_return({})
+
+      sess.participate(experiment_name, alternatives, nil, nil, '0.5')
+    end
+  end
 end

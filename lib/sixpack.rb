@@ -49,7 +49,7 @@ module Sixpack
       end
     end
 
-    def participate(experiment_name, alternatives, force=nil, kpi=nil)
+    def participate(experiment_name, alternatives, force=nil, kpi=nil, traffic_fraction=nil)
       if !(experiment_name =~ /^[a-z0-9][a-z0-9\-_ ]*$/)
         raise ArgumentError, "Bad experiment_name, must be lowercase, start with an alphanumeric and contain alphanumerics, dashes and underscores"
       end
@@ -64,12 +64,19 @@ module Sixpack
         end
       }
 
+      if traffic_fraction
+        raise ArgumentError, "Invalid traffic fraction, must be between 0 and 1" unless traffic_fraction.to_f.between?(0, 1)
+      end
+
       params = {
         :client_id => @client_id,
         :experiment => experiment_name,
         :alternatives => alternatives
       }
+
       params = params.merge(kpi: kpi) if kpi
+      params = params.merge(traffic_fraction: traffic_fraction) if traffic_fraction
+
       if !force.nil? && alternatives.include?(force)
         return {"status" => "ok", "alternative" => {"name" => force}, "experiment" => {"version" => 0, "name" => experiment_name}, "client_id" => @client_id}
       end

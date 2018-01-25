@@ -25,7 +25,7 @@ module Sixpack
 
 
   class Session
-    attr_reader :base_url
+    attr_reader :base_url, :read_timeout
     attr_accessor :client_id, :ip_address, :user_agent
 
     def initialize(client_id=nil, options={}, params={})
@@ -33,6 +33,7 @@ module Sixpack
       options = Sixpack.configuration.to_hash.merge(options)
 
       @base_url = options[:base_url]
+      @read_timeout = options[:read_timeout].to_i
       @user = options[:user]
       @password = options[:password]
 
@@ -116,7 +117,7 @@ module Sixpack
       end
 
       http.open_timeout = 1.0
-      http.read_timeout = 1.0
+      http.read_timeout = @read_timeout
       query = Addressable::URI.form_encode(self.build_params(params))
 
       begin

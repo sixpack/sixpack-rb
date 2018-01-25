@@ -9,30 +9,60 @@ RSpec.describe Sixpack do
   end
 
   context 'configuration' do
-    it 'should contain default base_url' do
-      s = Sixpack::Session.new("foo")
-      expect(s.base_url).to eq 'http://localhost:5000'
-    end
-
-    it 'should allow specifying the base_url in Session options' do
-      s = Sixpack::Session.new("foo", base_url: 'http://0.0.0.0:5555')
-      expect(s.base_url).to eq 'http://0.0.0.0:5555'
-    end
-
-    it 'should allow specifying the base_url in configuration block' do
-      Sixpack.configure do |config|
-        config.base_url = 'http://4.4.4.4'
+    describe 'base_url' do
+      it 'should contain default base_url' do
+        s = Sixpack::Session.new("foo")
+        expect(s.base_url).to eq 'http://localhost:5000'
       end
-      s = Sixpack::Session.new("foo")
-      expect(s.base_url).to eq 'http://4.4.4.4'
+
+      it 'should allow specifying the base_url in Session options' do
+        s = Sixpack::Session.new("foo", base_url: 'http://0.0.0.0:5555')
+        expect(s.base_url).to eq 'http://0.0.0.0:5555'
+      end
+
+      it 'should allow specifying the base_url in configuration block' do
+        Sixpack.configure do |config|
+          config.base_url = 'http://4.4.4.4'
+        end
+        s = Sixpack::Session.new("foo")
+        expect(s.base_url).to eq 'http://4.4.4.4'
+      end
+
+      it 'session base_url should override configuration base_url' do
+        Sixpack.configure do |config|
+          config.base_url = 'http://4.4.4.4'
+        end
+        s = Sixpack::Session.new("foo", base_url: 'http://5.5.5.5')
+        expect(s.base_url).to eq 'http://5.5.5.5'
+      end
     end
 
-    it 'session base_url should override configuration base_url' do
-      Sixpack.configure do |config|
-        config.base_url = 'http://4.4.4.4'
+    describe 'read_timeout' do
+      it 'should contain default read_timeout' do
+        s = Sixpack::Session.new('foo')
+        expect(s.read_timeout).to eq 1.0
       end
-      s = Sixpack::Session.new("foo", base_url: 'http://5.5.5.5')
-      expect(s.base_url).to eq 'http://5.5.5.5'
+
+      it 'should allow specifying the base_url in Session options' do
+        s = Sixpack::Session.new('foo', read_timeout: '1.0')
+        expect(s.read_timeout).to eq 1.0
+      end
+
+      it 'should allow specifying the read_timeout in configuration block' do
+        Sixpack.configure do |config|
+          config.read_timeout = '1.0'
+        end
+        s = Sixpack::Session.new('foo')
+        expect(s.read_timeout).to eq 1.0
+      end
+
+      it 'session read_timeout should override configuration read_timeout' do
+        Sixpack.configure do |config|
+          config.read_timeout = 1.0
+        end
+        s = Sixpack::Session.new('foo', read_timeout: 2.0)
+        expect(s.read_timeout).to eq 2.0
+      end
     end
   end
 

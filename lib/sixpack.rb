@@ -2,6 +2,7 @@ require "addressable/uri"
 require "net/http"
 require "json"
 require "uri"
+require 'securerandom'
 
 require "sixpack/version"
 require "sixpack/configuration"
@@ -76,7 +77,7 @@ module Sixpack
       params = params.merge(kpi: kpi) if kpi
       params = params.merge(traffic_fraction: traffic_fraction) if traffic_fraction
       if !force.nil? && alternatives.include?(force)
-        return {"status" => "ok", "alternative" => {"name" => force}, "experiment" => {"version" => 0, "name" => experiment_name}, "client_id" => @client_id}
+        params[:force] = force
       end
 
       res = self.get_response("/participate", params)

@@ -44,9 +44,14 @@ RSpec.describe Sixpack do
 
   it "should return the correct alternative for participate with force" do
     sess = Sixpack::Session.new("mike")
+
+    response = double(body: JSON.generate({ "alternative" => { "name" => "trolled" }}), code: 200)
+    allow_any_instance_of(Net::HTTP).to receive(:request).and_return(response)
     alt = sess.participate('show-bieber', ['trolled', 'not-trolled'], "trolled")["alternative"]["name"]
     expect(alt).to eq "trolled"
 
+    response = double(body: JSON.generate({ "alternative" => { "name" => "not-trolled" }}), code: 200)
+    allow_any_instance_of(Net::HTTP).to receive(:request).and_return(response)
     alt = sess.participate('show-bieber', ['trolled', 'not-trolled'], "not-trolled")["alternative"]["name"]
     expect(alt).to eq "not-trolled"
   end

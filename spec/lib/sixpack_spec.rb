@@ -56,6 +56,23 @@ RSpec.describe Sixpack do
     expect(alt).to eq "not-trolled"
   end
 
+  it 'should include the record_force in the outgoing request with force' do
+    experiment_name = 'show-bieber'
+    alternatives = ['trolled', 'not-trolled']
+
+    sess = Sixpack::Session.new('123')
+    expect(sess).to receive(:get_response)
+                      .with('/participate',
+                            client_id: '123',
+                            experiment: experiment_name,
+                            alternatives: alternatives,
+                            force: 'trolled',
+                            record_force: true)
+                      .and_return({})
+
+    sess.participate(experiment_name, alternatives, 'trolled', nil, nil, true)
+  end
+
   it "should allow ip and user agent to be passed to a session" do
     params = {:ip_address => '8.8.8.8', :user_agent => 'FirChromari'}
     session = Sixpack::Session.new('client_id', {}, params)
@@ -96,7 +113,6 @@ RSpec.describe Sixpack do
   end
 
   context 'KPI' do
-
     it 'should convert w/out a KPI' do
       sess = Sixpack::Session.new
       sess.participate('show-bieber', ['trolled', 'not-trolled'])

@@ -50,7 +50,7 @@ module Sixpack
       end
     end
 
-    def participate(experiment_name, alternatives, force=nil, kpi=nil, traffic_fraction=nil)
+    def participate(experiment_name, alternatives, force=nil, kpi=nil, traffic_fraction=nil, record_force=false)
       if !(experiment_name =~ /^[a-z0-9][a-z0-9\-_ ]*$/)
         raise ArgumentError, "Bad experiment_name, must be lowercase, start with an alphanumeric and contain alphanumerics, dashes and underscores"
       end
@@ -78,6 +78,7 @@ module Sixpack
       params = params.merge(traffic_fraction: traffic_fraction) if traffic_fraction
       if !force.nil? && alternatives.include?(force)
         params[:force] = force
+        params[:record_force] = record_force
       end
 
       res = self.get_response("/participate", params)

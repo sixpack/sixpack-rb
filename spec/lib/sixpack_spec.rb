@@ -44,11 +44,33 @@ RSpec.describe Sixpack do
 
   it "should return the correct alternative for participate with force" do
     sess = Sixpack::Session.new("mike")
+
+    response = double(body: JSON.generate({ "alternative" => { "name" => "trolled" }}), code: 200)
+    allow_any_instance_of(Net::HTTP).to receive(:request).and_return(response)
     alt = sess.participate('show-bieber', ['trolled', 'not-trolled'], "trolled")["alternative"]["name"]
     expect(alt).to eq "trolled"
 
+    response = double(body: JSON.generate({ "alternative" => { "name" => "not-trolled" }}), code: 200)
+    allow_any_instance_of(Net::HTTP).to receive(:request).and_return(response)
     alt = sess.participate('show-bieber', ['trolled', 'not-trolled'], "not-trolled")["alternative"]["name"]
     expect(alt).to eq "not-trolled"
+  end
+
+  it 'should include the record_force in the outgoing request with force' do
+    experiment_name = 'show-bieber'
+    alternatives = ['trolled', 'not-trolled']
+
+    sess = Sixpack::Session.new('123')
+    expect(sess).to receive(:get_response)
+                      .with('/participate',
+                            client_id: '123',
+                            experiment: experiment_name,
+                            alternatives: alternatives,
+                            force: 'trolled',
+                            record_force: true)
+                      .and_return({})
+
+    sess.participate(experiment_name, alternatives, 'trolled', nil, nil, true)
   end
 
   it "should allow ip and user agent to be passed to a session" do
@@ -91,7 +113,6 @@ RSpec.describe Sixpack do
   end
 
   context 'KPI' do
-
     it 'should convert w/out a KPI' do
       sess = Sixpack::Session.new
       sess.participate('show-bieber', ['trolled', 'not-trolled'])

@@ -8,6 +8,14 @@ require "sixpack/version"
 require "sixpack/configuration"
 
 module Sixpack
+  class SixpackRequestFailed < StandardError
+    attr_accessor :response
+
+    def initialize(response)
+      super
+      @response = response
+    end
+  end
 
   class << self
 
@@ -32,7 +40,6 @@ module Sixpack
     def initialize(client_id=nil, options={}, params={})
       # options supplied directly will override the configured options
       options = Sixpack.configuration.to_hash.merge(options)
-
       @base_url = options[:base_url]
       @user = options[:user]
       @password = options[:password]
@@ -82,10 +89,7 @@ module Sixpack
       end
 
       res = self.get_response("/participate", params)
-      # On server failure use control
-      if res["status"] == "failed"
-        res["alternative"] = {"name" => alternatives[0]}
-      end
+      raise SixpackRequestFailed.new(res) if res["status"] == "failed"
       res
     end
 

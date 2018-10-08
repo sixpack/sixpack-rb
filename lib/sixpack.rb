@@ -88,9 +88,9 @@ module Sixpack
         params[:record_force] = record_force
       end
 
-      res = self.get_response("/participate", params)
-      raise SixpackRequestFailed.new(res) if res["status"] == "failed"
-      res
+      response = self.get_response("/participate", params)
+      raise SixpackRequestFailed.new(response) if response["status"] == "failed"
+      response
     end
 
     def convert(experiment_name, kpi = nil)
@@ -99,7 +99,9 @@ module Sixpack
         :experiment => experiment_name
       }
       params = params.merge(kpi: kpi) if kpi
-      self.get_response("/convert", params)
+      response = self.get_response("/convert", params)
+      raise SixpackRequestFailed.new(response) if response["status"] == "failed"
+      response
     end
 
     def build_params(params)

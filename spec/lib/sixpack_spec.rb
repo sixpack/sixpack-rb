@@ -37,6 +37,9 @@ RSpec.describe Sixpack do
   end
 
   it "should return an alternative for participate" do
+    response = double(body: JSON.generate({ 'alternative' => { 'name' => 'trolled' }}), code: 200)
+    allow_any_instance_of(Net::HTTP).to receive(:request).and_return(response)
+
     sess = Sixpack::Session.new("mike")
     resp = sess.participate('show-bieber', ['trolled', 'not-trolled'])
     expect(['trolled', 'not-trolled']).to include(resp["alternative"]["name"])
@@ -96,8 +99,7 @@ RSpec.describe Sixpack do
     sess = Sixpack::Session.new
     response = double(body: 'something unexpected', code: 200)
     allow_any_instance_of(Net::HTTP).to receive(:get).and_return(response)
-    res = sess.participate('show-bieber', ['trolled', 'not-trolled'])
-    expect(res["status"]).to eq('failed')
+    expect { sess.participate('show-bieber', ['trolled', 'not-trolled']) }.to raise_error(Sixpack::SixpackRequestFailed)
   end
 
   it "should not allow bad alternatives names" do
@@ -113,20 +115,37 @@ RSpec.describe Sixpack do
   end
 
   context 'KPI' do
+    let(:participate_response) { double(body: JSON.generate({ 'alternative' => { 'name' => 'trolled' }}), code: 200) }
+    let(:convert_response) { double(body: '{}', code: 200) }
+
     it 'should convert w/out a KPI' do
       sess = Sixpack::Session.new
+
+      allow_any_instance_of(Net::HTTP).to receive(:request).and_return(participate_response)
       sess.participate('show-bieber', ['trolled', 'not-trolled'])
+
+      allow_any_instance_of(Net::HTTP).to receive(:request).and_return(convert_response)
       sess.convert('show-bieber')
     end
 
     it 'should allow setting a KPI when converting' do
       sess = Sixpack::Session.new
+
+      allow_any_instance_of(Net::HTTP).to receive(:request).and_return(participate_response)
       sess.participate('show-bieber', ['trolled', 'not-trolled'])
+
+      allow_any_instance_of(Net::HTTP).to receive(:request).and_return(convert_response)
       sess.convert('show-bieber', kpi = 'sales')
     end
   end
 
   context 'Traffic fraction' do
+    let(:participate_response) { double(body: JSON.generate({ 'alternative' => { 'name' => 'trolled' }}), code: 200) }
+
+    before do
+      allow_any_instance_of(Net::HTTP).to receive(:request).and_return(participate_response)
+    end
+
     it 'should not allow traffic fraction greater than 1' do
       expect {
         sess = Sixpack::Session.new

@@ -88,9 +88,7 @@ module Sixpack
         params[:record_force] = record_force
       end
 
-      response = self.get_response("/participate", params)
-      raise SixpackRequestFailed.new(response) if response["status"] == "failed"
-      response
+      self.get_response("/participate", params)
     end
 
     def convert(experiment_name, kpi = nil)
@@ -99,9 +97,7 @@ module Sixpack
         :experiment => experiment_name
       }
       params = params.merge(kpi: kpi) if kpi
-      response = self.get_response("/convert", params)
-      raise SixpackRequestFailed.new(response) if response["status"] == "failed"
-      response
+      self.get_response("/convert", params)
     end
 
     def build_params(params)
@@ -134,11 +130,12 @@ module Sixpack
           req.basic_auth(@user, @password)
         end
         res = http.request(req)
-      rescue
-        return {"status" => "failed", "error" => "http error"}
+      rescue => e
+        raise_sixpack_error!("Sixpack call error: #{e.message}")
       end
-      if res.code == "500"
-        {"status" => "failed", "response" => res.body}
+
+      if res.code.to_i == 500
+        raise_sixpack_error!("Sixpack internal server error")
       else
         parse_response(res)
       end
@@ -147,7 +144,13 @@ module Sixpack
     def parse_response(res)
       JSON.parse(res.body)
     rescue JSON::ParserError
-      {"status" => "failed", "response" => res.body}
+      raise_sixpack_error!("Error parsing sixpack response: #{res.body}")
+    end
+
+    private
+
+    def raise_sixpack_error!(response)
+      raise SixpackRequestFailed.new(response)
     end
   end
 end

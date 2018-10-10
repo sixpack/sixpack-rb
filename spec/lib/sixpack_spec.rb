@@ -98,8 +98,30 @@ RSpec.describe Sixpack do
   it "should not try parse bad response body data" do
     sess = Sixpack::Session.new
     response = double(body: 'something unexpected', code: 200)
-    allow_any_instance_of(Net::HTTP).to receive(:get).and_return(response)
-    expect { sess.participate('show-bieber', ['trolled', 'not-trolled']) }.to raise_error(Sixpack::SixpackRequestFailed)
+    allow_any_instance_of(Net::HTTP).to receive(:request).and_return(response)
+
+    expect do
+      sess.participate('show-bieber', ['trolled', 'not-trolled'])
+    end.to raise_error(Sixpack::SixpackRequestFailed, 'Error parsing sixpack response: something unexpected')
+  end
+
+  it "should raise if sixpack returns internal server error response" do
+    sess = Sixpack::Session.new
+    response = double(body: '{}', code: 500)
+    allow_any_instance_of(Net::HTTP).to receive(:request).and_return(response)
+
+    expect do
+      sess.participate('show-bieber', ['trolled', 'not-trolled'])
+    end.to raise_error(Sixpack::SixpackRequestFailed, 'Sixpack internal server error')
+  end
+
+  it "should raise if sixpack call fails" do
+    sess = Sixpack::Session.new
+    allow_any_instance_of(Net::HTTP).to receive(:request).and_raise(StandardError.new('Error message'))
+
+    expect do
+      sess.participate('show-bieber', ['trolled', 'not-trolled'])
+    end.to raise_error(Sixpack::SixpackRequestFailed, 'Sixpack call error: Error message')
   end
 
   it "should not allow bad alternatives names" do

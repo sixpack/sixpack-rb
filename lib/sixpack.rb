@@ -8,14 +8,7 @@ require "sixpack/version"
 require "sixpack/configuration"
 
 module Sixpack
-  class SixpackRequestFailed < StandardError
-    attr_accessor :response
-
-    def initialize(response)
-      super
-      @response = response
-    end
-  end
+  SixpackRequestFailed = Class.new(StandardError)
 
   class << self
 
@@ -133,12 +126,11 @@ module Sixpack
       rescue => e
         raise_sixpack_error!("Sixpack call error: #{e.message}")
       end
+      raise_sixpack_error!("Sixpack internal server error") if res.code.to_i == 500
+      parsed_response = parse_response(res)
 
-      if res.code.to_i == 500
-        raise_sixpack_error!("Sixpack internal server error")
-      else
-        parse_response(res)
-      end
+      raise_sixpack_error!(parsed_response['message']) if parsed_response['status'] == 'failed'
+      parsed_response
     end
 
     def parse_response(res)

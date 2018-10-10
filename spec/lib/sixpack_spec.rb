@@ -92,7 +92,7 @@ RSpec.describe Sixpack do
     expect {
       sess = Sixpack::Session.new
       sess.participate('%%', ['trolled', 'not-trolled'], nil)
-    }.to raise_error
+    }.to raise_error(ArgumentError, 'Bad experiment_name, must be lowercase, start with an alphanumeric and contain alphanumerics, dashes and underscores')
   end
 
   it "should not try parse bad response body data" do
@@ -128,12 +128,12 @@ RSpec.describe Sixpack do
     expect {
       sess = Sixpack::Session.new
       sess.participate('show-bieber', ['trolled'], nil)
-    }.to raise_error
+    }.to raise_error(ArgumentError, 'Must specify at least 2 alternatives')
 
     expect {
       sess = Sixpack::Session.new
       sess.participate('show-bieber', ['trolled', '%%'], nil)
-    }.to raise_error
+    }.to raise_error(ArgumentError, 'Bad alternative name: %%, must be lowercase, start with an alphanumeric and contain alphanumerics, dashes and underscores')
   end
 
   context 'KPI' do
@@ -172,14 +172,14 @@ RSpec.describe Sixpack do
       expect {
         sess = Sixpack::Session.new
         sess.participate('show-bieber', ['trolled', 'not-trolled'], nil, nil, '1.1')
-      }.to raise_error
+      }.to raise_error(ArgumentError, 'Invalid traffic fraction, must be between 0 and 1')
     end
 
     it 'should not allow traffic fraction less than 0' do
       expect {
         sess = Sixpack::Session.new
         sess.participate('show-bieber', ['trolled', 'not-trolled'], nil, nil, '-1')
-      }.to raise_error
+      }.to raise_error(ArgumentError, 'Invalid traffic fraction, must be between 0 and 1')
     end
 
     it 'should allow traffic fraction when valid value is passed' do

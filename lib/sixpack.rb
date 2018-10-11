@@ -8,6 +8,7 @@ require "sixpack/version"
 require "sixpack/configuration"
 
 module Sixpack
+  SixpackRequestFailed = Class.new(StandardError)
 
   class << self
 
@@ -32,7 +33,6 @@ module Sixpack
     def initialize(client_id=nil, options={}, params={})
       # options supplied directly will override the configured options
       options = Sixpack.configuration.to_hash.merge(options)
-
       @base_url = options[:base_url]
       @user = options[:user]
       @password = options[:password]
@@ -81,12 +81,7 @@ module Sixpack
         params[:record_force] = record_force
       end
 
-      res = self.get_response("/participate", params)
-      # On server failure use control
-      if res["status"] == "failed"
-        res["alternative"] = {"name" => alternatives[0]}
-      end
-      res
+      self.get_response("/participate", params)
     end
 
     def convert(experiment_name, kpi = nil)
@@ -128,20 +123,26 @@ module Sixpack
           req.basic_auth(@user, @password)
         end
         res = http.request(req)
-      rescue
-        return {"status" => "failed", "error" => "http error"}
+      rescue => e
+        raise_sixpack_error!("Sixpack call error: #{e.message}")
       end
-      if res.code == "500"
-        {"status" => "failed", "response" => res.body}
-      else
-        parse_response(res)
-      end
+      raise_sixpack_error!("Sixpack internal server error") if res.code.to_i == 500
+      parsed_response = parse_response(res)
+
+      raise_sixpack_error!(parsed_response['message']) if parsed_response['status'] == 'failed'
+      parsed_response
     end
 
     def parse_response(res)
       JSON.parse(res.body)
     rescue JSON::ParserError
-      {"status" => "failed", "response" => res.body}
+      raise_sixpack_error!("Error parsing sixpack response: #{res.body}")
+    end
+
+    private
+
+    def raise_sixpack_error!(response)
+      raise SixpackRequestFailed.new(response)
     end
   end
 end

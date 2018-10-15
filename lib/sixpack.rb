@@ -69,6 +69,10 @@ module Sixpack
         raise ArgumentError, "Invalid traffic fraction, must be between 0 and 1" unless traffic_fraction.to_f.between?(0,1)
       end
 
+      if force && !alternatives.include?(force)
+        raise ArgumentError, 'Cannot force an alternative that is not specified on alternatives argument'
+      end
+
       params = {
         :client_id => @client_id,
         :experiment => experiment_name,
@@ -76,10 +80,9 @@ module Sixpack
       }
       params = params.merge(kpi: kpi) if kpi
       params = params.merge(traffic_fraction: traffic_fraction) if traffic_fraction
-      if !force.nil? && alternatives.include?(force)
-        params[:force] = force
-        params[:record_force] = record_force
-      end
+
+      params[:force] = force if force
+      params[:record_force] = record_force if record_force
 
       self.get_response("/participate", params)
     end

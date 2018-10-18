@@ -70,10 +70,27 @@ RSpec.describe Sixpack do
                             experiment: experiment_name,
                             alternatives: alternatives,
                             force: 'trolled',
+                            prefetch: false,
                             record_force: true)
                       .and_return({})
 
     sess.participate(experiment_name, alternatives, 'trolled', nil, nil, true)
+  end
+
+  it 'should include the prefetch in the outgoing request' do
+    experiment_name = 'experiment_name'
+    alternatives = ['variant', 'control']
+
+    sess = Sixpack::Session.new('client_id')
+    expect(sess).to receive(:get_response)
+                      .with('/participate',
+                            client_id: 'client_id',
+                            experiment: experiment_name,
+                            alternatives: alternatives,
+                            prefetch: true)
+                      .and_return({})
+
+    sess.participate(experiment_name, alternatives, nil, nil, nil, nil, true)
   end
 
   it "should allow ip and user agent to be passed to a session" do
@@ -213,7 +230,8 @@ RSpec.describe Sixpack do
               client_id: '123',
               experiment: experiment_name,
               alternatives: alternatives,
-              traffic_fraction: '0.5')
+              traffic_fraction: '0.5',
+              prefetch: false)
         .and_return({})
 
       sess.participate(experiment_name, alternatives, nil, nil, '0.5')

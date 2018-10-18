@@ -95,6 +95,13 @@ RSpec.describe Sixpack do
     }.to raise_error(ArgumentError, 'Bad experiment_name, must be lowercase, start with an alphanumeric and contain alphanumerics, dashes and underscores')
   end
 
+  it "should not allow force alternative that's not specified on alternatives list" do
+    expect {
+      sess = Sixpack::Session.new
+      sess.participate('experiment', ['control', 'variant'], 'control2')
+    }.to raise_error(ArgumentError, 'Cannot force an alternative that is not specified on alternatives argument')
+  end
+
   it "should not try parse bad response body data" do
     sess = Sixpack::Session.new
     response = double(body: 'something unexpected', code: 200)

@@ -50,7 +50,7 @@ module Sixpack
       end
     end
 
-    def participate(experiment_name, alternatives, force=nil, kpi=nil, traffic_fraction=nil, record_force=false, prefetch=false)
+    def participate(experiment_name, alternatives, force=nil, kpi=nil, traffic_fraction=nil, record_force=false, prefetch=false, readonly=false)
       if !(experiment_name =~ /^[a-z0-9][a-z0-9\-_ ]*$/)
         raise ArgumentError, "Bad experiment_name, must be lowercase, start with an alphanumeric and contain alphanumerics, dashes and underscores"
       end
@@ -77,7 +77,8 @@ module Sixpack
         client_id: @client_id,
         experiment: experiment_name,
         alternatives: alternatives,
-        prefetch: prefetch
+        prefetch: prefetch,
+        readonly: readonly
       }
       params = params.merge(kpi: kpi) if kpi
       params = params.merge(traffic_fraction: traffic_fraction) if traffic_fraction
